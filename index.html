@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduClip AI - Transform Educational Videos with AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-light: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0.05;
+        }
+        
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            top: -250px;
+            right: -250px;
+            animation-delay: 0s;
+        }
+        
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            animation-delay: 7s;
+        }
+        
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 14s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        /* Header/Navbar */
+        .navbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo::before {
+            content: '◆';
+            font-size: 1.8rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--glass-bg);
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Views */
+        .view {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .view.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Auth View */
+        .auth-container {
+            min-height: calc(100vh - 100px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .auth-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .auth-header p {
+            color: var(--text-secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Dashboard */
+        .dashboard-header {
+            margin-bottom: 3rem;
+        }
+        
+        .dashboard-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .stat-icon.accent {
+            background: linear-gradient(135deg, var(--accent), #db2777);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Upload Section */
+        .upload-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .upload-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-tab {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .upload-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .upload-tab-content {
+            display: none;
+        }
+        
+        .upload-tab-content.active {
+            display: block;
+        }
+        
+        .dropzone {
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .dropzone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .dropzone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .dropzone-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .dropzone-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .dropzone-hint {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .url-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .url-input {
+            flex: 1;
+        }
+        
+        /* Video Cards */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .video-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .video-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .video-content {
+            padding: 1.5rem;
+        }
+        
+        .video-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .video-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        
+        .video-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .video-status.processing {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .video-status.complete {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .video-status.failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+        }
+        
+        .video-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-light);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .result-section {
+            margin-bottom: 2rem;
+        }
+        
+        .result-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .transcript-segment {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timestamp {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .concepts-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .concept-tag {
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--primary);
+        }
+        
+        .clips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .clip-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .clip-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease-out;
+            display: none;
+        }
+        
+        .notification.show {
+            display: block;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .dashboard-title {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .upload-tabs {
+                flex-direction: column;
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">EduClip AI</div>
+            <div class="nav-buttons">
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <span id="username"></span>
+                </div>
+                <button class="btn btn-primary" id="loginBtn">Login</button>
+                <button class="btn btn-secondary" id="logoutBtn" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Auth View -->
+    <div class="view active" id="authView">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2 id="authTitle">Welcome Back</h2>
+                    <p id="authSubtitle">Sign in to continue to EduClip AI</p>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="email" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" name="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+                    <div class="auth-switch">
+                        Don't have an account? <a id="showRegister">Sign up</a>
+                    </div>
+                </form>
+                
+                <!-- Register Form -->
+                <form id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" name="username" required placeholder="johndoe">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="email" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" name="password" required placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role">
+                            <option value="student">Student</option>
+                            <option value="educator">Educator</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                    <div class="auth-switch">
+                        Already have an account? <a id="showLogin">Sign in</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard View -->
+    <div class="view" id="dashboardView">
+        <div class="container">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Dashboard</h1>
+                <p class="dashboard-subtitle">Transform your educational videos with AI</p>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon primary">ðŸŽ¬</div>
+                    <div class="stat-value" id="totalVideos">0</div>
+                    <div class="stat-label">Total Videos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon success">âœ…</div>
+                    <div class="stat-value" id="completedVideos">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon warning">âš™ï¸</div>
+                    <div class="stat-value" id="processingVideos">0</div>
+                    <div class="stat-label">Processing</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon accent">✂️</div>
+                    <div class="stat-value" id="totalClips">0</div>
+                    <div class="stat-label">Generated Clips</div>
+                </div>
+            </div>
+            
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <div class="upload-tabs">
+                    <div class="upload-tab active" data-tab="upload">
+                        📤 Upload Video
+                    </div>
+                    <div class="upload-tab" data-tab="youtube">
+                        🎥 YouTube URL
+                    </div>
+                </div>
+                
+                <!-- Upload Tab -->
+                <div class="upload-tab-content active" id="uploadTab">
+                    <form id="uploadForm">
+                        <div class="form-group">
+                            <label class="form-label">Video Title</label>
+                            <input type="text" class="form-input" name="title" required placeholder="Introduction to Machine Learning">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description (Optional)</label>
+                            <input type="text" class="form-input" name="description" placeholder="A comprehensive guide to ML basics">
+                        </div>
+                        <div class="dropzone" id="dropzone">
+                            <div class="dropzone-icon">ðŸ"</div>
+                            <div class="dropzone-text">Drag & drop your video here</div>
+                            <div class="dropzone-hint">or click to browse (MP4, AVI, MOV, MKV, WEBM)</div>
+                            <input type="file" id="fileInput" accept="video/*" style="display: none;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                            Upload & Process
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- YouTube Tab -->
+                <div class="upload-tab-content" id="youtubeTab">
+                    <form id="youtubeForm">
+                        <div class="form-group">
+                            <label class="form-label">Video Title</label>
+                            <input type="text" class="form-input" name="title" required placeholder="Stanford CS229 Lecture">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description (Optional)</label>
+                            <input type="text" class="form-input" name="description" placeholder="Machine Learning lecture series">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">YouTube URL</label>
+                            <div class="url-input-group">
+                                <input type="url" class="form-input url-input" name="url" required 
+                                       placeholder="https://www.youtube.com/watch?v=...">
+                                <button type="submit" class="btn btn-primary">
+                                    Process Video
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Videos List -->
+            <h2 style="margin-bottom: 2rem; font-family: 'Space Grotesk', sans-serif;">Your Videos</h2>
+            <div class="videos-grid" id="videosGrid">
+                <!-- Videos will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Modal -->
+    <div class="modal" id="resultsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Video Results</h2>
+                <button class="modal-close" id="closeModal">✕</button>
+            </div>
+            <div id="modalBody">
+                <!-- Results will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Configuration
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000' 
+            : window.location.origin;
+        
+        let authToken = localStorage.getItem('token');
+        let currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+        let videosPolling = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (authToken && currentUser) {
+                showDashboard();
+                loadDashboard();
+            }
+            setupEventListeners();
+        });
+        
+        // Event Listeners
+        function setupEventListeners() {
+            // Auth
+            document.getElementById('showRegister').addEventListener('click', () => {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+                document.getElementById('authTitle').textContent = 'Create Account';
+                document.getElementById('authSubtitle').textContent = 'Join EduClip AI today';
+            });
+            
+            document.getElementById('showLogin').addEventListener('click', () => {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('authTitle').textContent = 'Welcome Back';
+                document.getElementById('authSubtitle').textContent = 'Sign in to continue to EduClip AI';
+            });
+            
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                showView('authView');
+            });
+            
+            // Upload tabs
+            document.querySelectorAll('.upload-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.upload-tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+                });
+            });
+            
+            // File upload
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+            
+            dropzone.addEventListener('click', () => fileInput.click());
+            
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+            
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('dragover');
+            });
+            
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                fileInput.files = e.dataTransfer.files;
+                updateDropzoneText();
+            });
+            
+            fileInput.addEventListener('change', updateDropzoneText);
+            
+            document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+            document.getElementById('youtubeForm').addEventListener('submit', handleYouTube);
+            
+            // Modal
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('resultsModal').addEventListener('click', (e) => {
+                if (e.target.id === 'resultsModal') closeModal();
+            });
+        }
+        
+        function updateDropzoneText() {
+            const fileInput = document.getElementById('fileInput');
+            const dropzone = document.getElementById('dropzone');
+            if (fileInput.files.length > 0) {
+                dropzone.querySelector('.dropzone-text').textContent = fileInput.files[0].name;
+                dropzone.querySelector('.dropzone-hint').textContent = 'Click to change file';
+            }
+        }
+        
+        // Auth Functions
+        async function handleLogin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    authToken = result.access_token;
+                    currentUser = result.user;
+                    localStorage.setItem('token', authToken);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    showNotification('Login successful!', 'success');
+                    showDashboard();
+                    loadDashboard();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail || 'Login failed', 'error');
+                }
+            } catch (err) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+        
+        async function handleRegister(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: formData.get('role')
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    authToken = result.access_token;
+                    currentUser = result.user;
+                    localStorage.setItem('token', authToken);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    showNotification('Account created successfully!', 'success');
+                    showDashboard();
+                    loadDashboard();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail || 'Registration failed', 'error');
+                }
+            } catch (err) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+        
+        function handleLogout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            if (videosPolling) clearInterval(videosPolling);
+            showView('authView');
+            showNotification('Logged out successfully', 'success');
+        }
+        
+        function showDashboard() {
+            showView('dashboardView');
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('username').textContent = currentUser.username;
+            document.getElementById('userAvatar').textContent = currentUser.username[0].toUpperCase();
+        }
+        
+        // Dashboard Functions
+        async function loadDashboard() {
+            await Promise.all([
+                loadStats(),
+                loadVideos()
+            ]);
+            
+            // Poll for updates
+            if (videosPolling) clearInterval(videosPolling);
+            videosPolling = setInterval(loadVideos, 5000);
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/analytics/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalVideos').textContent = data.total_videos;
+                    document.getElementById('completedVideos').textContent = data.completed_videos;
+                    document.getElementById('processingVideos').textContent = data.processing_videos;
+                    document.getElementById('totalClips').textContent = data.total_clips;
+                }
+            } catch (err) {
+                console.error('Failed to load stats:', err);
+            }
+        }
+        
+        async function loadVideos() {
+            try {
+                const response = await fetch(`${API_URL}/api/videos`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderVideos(data.videos);
+                    loadStats(); // Update stats
+                }
+            } catch (err) {
+                console.error('Failed to load videos:', err);
+            }
+        }
+        
+        function renderVideos(videos) {
+            const grid = document.getElementById('videosGrid');
+            
+            if (videos.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">ðŸŽ¬</div>
+                        <p>No videos yet. Upload your first video to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = videos.map(video => `
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        ${video.source === 'youtube' ? 'ðŸŽ¥' : 'ðŸ"¹'}
+                    </div>
+                    <div class="video-content">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-meta">
+                            <span>📅 ${new Date(video.uploaded_at).toLocaleDateString()}</span>
+                            <span>👁️ ${video.views} views</span>
+                        </div>
+                        <div class="video-status ${video.status}">
+                            ${video.status === 'processing' ? '<span class="spinner"></span>' : ''}
+                            ${getStatusText(video.status)}
+                        </div>
+                        ${video.progress > 0 && video.status !== 'complete' ? `
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${video.progress}%"></div>
+                            </div>
+                        ` : ''}
+                        <div class="video-actions">
+                            ${video.status === 'complete' ? `
+                                <button class="btn btn-primary btn-sm" onclick="viewResults('${video.video_id}')">
+                                    View Results
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-secondary btn-sm" onclick="deleteVideo('${video.video_id}')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getStatusText(status) {
+            const statusMap = {
+                'uploading': 'Uploading...',
+                'downloading': 'Downloading...',
+                'processing': 'Processing...',
+                'transcribing': 'Transcribing...',
+                'analyzing': 'Analyzing...',
+                'generating_clips': 'Generating Clips...',
+                'complete': 'Complete',
+                'failed': 'Failed'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // Upload Functions
+        async function handleUpload(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            if (!document.getElementById('fileInput').files[0]) {
+                showNotification('Please select a video file', 'error');
+                return;
+            }
+            
+            formData.append('file', document.getElementById('fileInput').files[0]);
+            
+            try {
+                const response = await fetch(`${API_URL}/api/videos/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showNotification('Video uploaded! Processing started.', 'success');
+                    e.target.reset();
+                    document.getElementById('dropzone').querySelector('.dropzone-text').textContent = 'Drag & drop your video here';
+                    document.getElementById('dropzone').querySelector('.dropzone-hint').textContent = 'or click to browse (MP4, AVI, MOV, MKV, WEBM)';
+                    loadDashboard();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail || 'Upload failed', 'error');
+                }
+            } catch (err) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+        
+        async function handleYouTube(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = {
+                url: formData.get('url'),
+                title: formData.get('title'),
+                description: formData.get('description')
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/videos/youtube`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showNotification('YouTube video processing started!', 'success');
+                    e.target.reset();
+                    loadDashboard();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail || 'Processing failed', 'error');
+                }
+            } catch (err) {
+                showNotification('Network error. Please try again.', 'error');
+            }
+        }
+        
+        // Results Functions
+        async function viewResults(videoId) {
+            try {
+                const [transcript, summary, clips] = await Promise.all([
+                    fetch(`${API_URL}/api/videos/${videoId}/transcript`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    }).then(r => r.json()),
+                    fetch(`${API_URL}/api/videos/${videoId}/summary`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    }).then(r => r.json()),
+                    fetch(`${API_URL}/api/videos/${videoId}/clips`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    }).then(r => r.json())
+                ]);
+                
+                renderResults(transcript, summary, clips);
+                document.getElementById('resultsModal').classList.add('active');
+            } catch (err) {
+                showNotification('Failed to load results', 'error');
+            }
+        }
+        
+        function renderResults(transcript, summary, clips) {
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                <div class="result-section">
+                    <h3>📝 Summary</h3>
+                    <p style="line-height: 1.8; color: var(--text-secondary);">
+                        ${summary.executive_summary}
+                    </p>
+                    <div class="concepts-list">
+                        ${summary.key_concepts.map(c => `<span class="concept-tag">${c}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <h3>ðŸŽ¯ Key Takeaways</h3>
+                    <ul style="padding-left: 1.5rem; color: var(--text-secondary); line-height: 2;">
+                        ${summary.key_takeaways.map(t => `<li>${t}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="result-section">
+                    <h3>ðŸ"„ Transcript</h3>
+                    ${transcript.segments.map(s => `
+                        <div class="transcript-segment">
+                            <div class="timestamp">${formatTime(s.start)} - ${formatTime(s.end)}</div>
+                            <div>${s.text}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="result-section">
+                    <h3>✂️ Generated Clips (${clips.clips.length})</h3>
+                    <div class="clips-grid">
+                        ${clips.clips.map(c => `
+                            <div class="clip-card">
+                                <div class="clip-icon">ðŸŽ¬</div>
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;">${c.title}</div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                                    ${formatTime(c.start_time)} - ${formatTime(c.end_time)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function closeModal() {
+            document.getElementById('resultsModal').classList.remove('active');
+        }
+        
+        // Delete Function
+        async function deleteVideo(videoId) {
+            if (!confirm('Are you sure you want to delete this video?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/videos/${videoId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    showNotification('Video deleted successfully', 'success');
+                    loadDashboard();
+                } else {
+                    showNotification('Failed to delete video', 'error');
+                }
+            } catch (err) {
+                showNotification('Network error', 'error');
+            }
+        }
+        
+        // Utility Functions
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
