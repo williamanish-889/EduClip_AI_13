@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: pip install --no-build-isolation -r requirements.txt
+    buildCommand: pip install --prefer-binary -r requirements.txt
     startCommand: gunicorn backend:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
     envVars:
       - key: SECRET_KEY
