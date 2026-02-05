@@ -19,9 +19,9 @@ from pathlib import Path
 import logging
 
 # JWT and Security
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+import jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import hashlib
 
 # Initialize FastAPI
 app = FastAPI(
@@ -57,9 +57,24 @@ THUMBNAILS_DIR = Path("storage/thumbnails")
 for directory in [UPLOAD_DIR, CLIPS_DIR, THUMBNAILS_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Security functions
+def hash_password(password: str) -> str:
+    """Hash password using SHA-256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify password against hash"""
+    return hash_password(plain_password) == hashed_password
+
 security = HTTPBearer()
+
+# JWT token creation
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 # In-memory database (replace with PostgreSQL in production)
 users_db = {}
@@ -96,14 +111,7 @@ class VideoProcessingStatus(BaseModel):
     progress: int
     message: str
 
-# Helper Functions
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-def create_access_token(data: dict):
+# Pydantic Models
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
@@ -121,7 +129,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         if user is None:
             raise HTTPException(status_code=401, detail="User not found")
         return user
-    except JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 # YouTube Download Function (using yt-dlp)
@@ -286,7 +294,7 @@ async def register(user: UserRegister):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     user_id = str(uuid.uuid4())
-    hashed_password = get_password_hash(user.password)
+    hashed_password = hash_password(user.password)
     
     user_data = {
         "user_id": user_id,
